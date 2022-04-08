@@ -1,9 +1,16 @@
+import enum
+from lib2to3.pgen2 import token
+import string
 from Syntax.Token import Token
 from Syntax.TokenKind import TokenKind
 
 
 class Lexer:
-    def __init__(self, text):
+    text: string
+    pos: int
+    tokens: list[Token]
+
+    def __init__(self, text: str):
         self._text = text
         self._pos = 0
         self.tokens = []
@@ -43,7 +50,6 @@ class Lexer:
                 self._pos += 1
 
             elif self._current_char() == '(':
-
                 self.tokens.append(Token(TokenKind.FunctionName, start, self._pos - start))
                 return
 
@@ -118,3 +124,6 @@ class Lexer:
             else:
                 self.tokens.append(Token(TokenKind.Invalid, self._pos, 1))
                 self._pos += 1
+
+
+

@@ -2,7 +2,7 @@ from Syntax.TokenKind import TokenKind
 
 
 class Token:
-    def __init__(self, kind: TokenKind, pos, len):
+    def __init__(self, kind: TokenKind, pos: int, len: int):
         self.kind = kind
         self.pos = pos
         self.len = len
