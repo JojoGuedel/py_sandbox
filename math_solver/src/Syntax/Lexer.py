@@ -1,4 +1,4 @@
-from Syntax.Token import Token
+from Syntax.Node.Token import Token
 from Syntax.TokenKind import TokenKind
 
 

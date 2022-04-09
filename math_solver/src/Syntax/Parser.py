@@ -1,136 +1,20 @@
-from Syntax.Token import Token
+from Syntax.Invalid import Invalid
+from Syntax.Node.BinaryExpression import BinaryExpression
+from Syntax.Node.Equation import Equation
+from Syntax.Node.Function import Function
+from Syntax.Node.Literal import Literal
+from Syntax.Node.Number import Number
+from Syntax.Node.ParenthesizedExpression import ParenthesizedExpression
+from Syntax.Node.SyntaxNode import SyntaxNode
+from Syntax.Node.Token import Token
+from Syntax.Node.UnaryExpression import UnaryExpression
 from Syntax.TokenKind import TokenKind
 
-class ParserNode:
-    def get_childrens():
-        pass
-
-class EquationParserNode(ParserNode):
-    def __init__(self, left: ParserNode, op: Token, right: ParserNode):
-        self.left = left
-        self.op = op
-        self.right = right
-
-    def __str__(self):
-        return f"{__class__.__name__}({str(self.left)} [=] {str(self.right)})"
-
-    def __repr__(self):
-        return str(self)
-        
-    def get_childrens(self):
-        return [self.left, self.op, self.right]
-
-class BinaryExpressionParserNode(ParserNode):
-    def __init__(self, left: ParserNode, op: Token, right: ParserNode):
-        self.left = left
-        self.op = op
-        self.right = right
-
-    def __str__(self):
-        return f"{__class__.__name__}({str(self.left)}, {str(self.op)}, {str(self.right)})"
-
-    def __repr__(self):
-        return str(self)   
-
-    def get_childrens(self):
-        return [self.left, self.op, self.right]
-
-class UnaryExpressionParserNode(ParserNode):
-    def __init__(self, op: Token, right: ParserNode):
-        self.op = op
-        self.right = right
-
-    def __str__(self):
-        return f"{__class__.__name__}({str(self.op)}, {str(self.right)})"
-
-    def __repr__(self):
-        return str(self)
-            
-    def get_childrens(self):
-        return [self.op, self.right]
-
-class ParenthesizedExpressionParserNode(ParserNode):
-    def __init__(self, l_paren: Token, expr: ParserNode, r_paren: Token):
-        self.l_paren = l_paren
-        self.expr = expr
-        self.r_paren = r_paren
-
-    def __str__(self):
-        return f"{__class__.__name__}({str(self.expr)})"
-
-    def __repr__(self):
-        return str(self)
-            
-    def get_childrens(self):
-        return [self.l_paren, self.expr, self.r_paren]
-
-class FunctionParserNode(ParserNode):
-    def __init__(self, function_name: Token, l_paren: Token, args: list[ParserNode], r_paren: Token):
-        self.function_name = function_name
-        self.l_paren = l_paren
-        self.args = args
-        self.r_paren = r_paren
-
-    def __str__(self):
-        s = f"{__class__.__name__}({self.function_name}("
-
-        for i in self.args:
-            s += f"{str(i)}, "
-
-        return s[:-2] + ")"
-
-    def __repr__(self):
-        return str(self)
-            
-    def get_childrens(self):
-        ret = [self.function_name, self.l_paren]
-        ret.extend(self.args)
-        ret.append(self.r_paren)
-        return ret
-
-class NumberParserNode(ParserNode):
-    def __init__(self, token: Token):
-        self.token = token
-
-    def __str__(self):
-        return f"{__class__.__name__}({self.token})"
-
-    def __repr__(self):
-        return str(self)
-        
-    def get_childrens(self):
-        return [self.token]
-
-class LiteralParserNode(ParserNode):
-    def __init__(self, token: Token):
-        self.token = token
-
-    def __str__(self):
-        return f"{__class__.__name__}({self.token})"
-
-    def __repr__(self):
-        return str(self)
-        
-    def get_childrens(self):
-        return [self.token]
-
-class InvalidParserNode(ParserNode):
-    def __init__(self, token: Token):
-        self.token = token
-
-    def __str__(self):
-        return f"{__class__.__name__}({self.token})"
-
-    def __repr__(self):
-        return str(self)
-        
-    def get_childrens(self):
-        return [self.token]
 
 class Parser:
     _pos: int
     _tokens: list[Token]
-    tree: ParserNode
+    tree: SyntaxNode
 
     def __init__(self, tokens: list[Token]):
         self._pos = 0
@@ -177,7 +61,7 @@ class Parser:
             op = self._advance()
             right = self._parse_expression()
 
-            return EquationParserNode(left, op, right)
+            return Equation(left, op, right)
 
         return left
 
@@ -187,10 +71,10 @@ class Parser:
 
         left = self._parse_binary_expression(operator_precedence - 1)
 
-        while self._current_token().get_precedence() == operator_precedence:
+        while self._current_token().precedence() == operator_precedence:
             op = self._advance()
             right = self._parse_binary_expression(operator_precedence - 1)
-            left = BinaryExpressionParserNode(left, op, right)
+            left = BinaryExpression(left, op, right)
 
         return left
 
@@ -199,7 +83,7 @@ class Parser:
             op = self._advance()
             right = self._parse_unary_expression()
 
-            return UnaryExpressionParserNode(op, right)
+            return UnaryExpression(op, right)
 
         return self._parse_implicit_multiply()
 
@@ -215,7 +99,7 @@ class Parser:
             right = self._parse_unary_expression()
 
             # TODO: differenciate this from binary expression for esthetics
-            return BinaryExpressionParserNode(left, op, right)
+            return BinaryExpression(left, op, right)
 
         return left
 
@@ -230,23 +114,23 @@ class Parser:
             expr = self._parse_expression()
             r_paren = self._expect_kind(TokenKind.RParen)
 
-            return ParenthesizedExpressionParserNode(l_paren, expr, r_paren)
+            return ParenthesizedExpression(l_paren, expr, r_paren)
 
         elif current_token.kind == TokenKind.Number:
-            return NumberParserNode(self._advance())
+            return Number(self._advance())
 
         elif current_token.kind == TokenKind.Literal:
-            return LiteralParserNode(self._advance())
+            return Literal(self._advance())
 
         else:
             # TODO: add diagnostics
-            return InvalidParserNode(self._advance())
+            return Invalid(self._advance())
 
     def _parse_function(self):
         function_name = self._advance()
         l_paren = self._expect_kind(TokenKind.LParen)
 
-        args: list[ParserNode] = []
+        args: list[SyntaxNode] = []
         if self._current_token().kind != TokenKind.RParen:
             args.append(self._parse_expression())
 
@@ -256,4 +140,4 @@ class Parser:
 
         r_paren = self._expect_kind(TokenKind.RParen)
 
-        return FunctionParserNode(function_name, l_paren, args, r_paren)
+        return Function(function_name, l_paren, args, r_paren)
