@@ -1,16 +1,15 @@
+from Diagnostics.DiagnosticBag import DiagnosticBag
+from Diagnostics.Kind.InvalidChar import InvalidChar
 from Syntax.Node.Token import Token
 from Syntax.TokenKind import TokenKind
 
 
 class Lexer:
-    text: str
-    pos: int
-    tokens: list[Token]
-
-    def __init__(self, text: str):
-        self._text = text
-        self._pos = 0
-        self.tokens = []
+    def __init__(self, text: str, diagnostics: DiagnosticBag):
+        self._text: str = text
+        self._pos: int = 0
+        self._diagnostics = diagnostics
+        self.tokens: list[Token] = []
 
     def _current_char(self) -> str:
         if self._pos >= 0 and self._pos < len(self._text):
@@ -119,6 +118,8 @@ class Lexer:
                 self._lex_space()
 
             else:
+                self._diagnostics.append(InvalidChar(self._pos, 1, self._current_char()))
+
                 self.tokens.append(Token(TokenKind.Invalid, self._pos, 1))
                 self._pos += 1
 

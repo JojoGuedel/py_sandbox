@@ -1,4 +1,6 @@
-from Syntax.Invalid import Invalid
+from Diagnostics.DiagnosticBag import DiagnosticBag
+from Diagnostics.Kind.UnexpectedToken import UnexpectedToken
+from Syntax.Node.Invalid import Invalid
 from Syntax.Node.BinaryExpression import BinaryExpression
 from Syntax.Node.Equation import Equation
 from Syntax.Node.Function import Function
@@ -12,13 +14,12 @@ from Syntax.TokenKind import TokenKind
 
 
 class Parser:
-    _pos: int
-    _tokens: list[Token]
-    tree: SyntaxNode
-
-    def __init__(self, tokens: list[Token]):
-        self._pos = 0
-        self._tokens = tokens
+    def __init__(self, tokens: list[Token], diagnostics: DiagnosticBag):
+        self._pos: int = 0
+        self._tokens: list[Token] = tokens
+        self._valid_token = self._current_token().kind != TokenKind.Invalid
+        self._diagnostics: DiagnosticBag = diagnostics
+        self.tree: SyntaxNode
 
     def _current_token(self):
         if self._pos >= 0 and self._pos < len(self._tokens):
@@ -30,12 +31,12 @@ class Parser:
     def _advance(self):
         token = self._current_token()
         self._pos += 1
+        self._valid_token = self._current_token().kind != TokenKind.Invalid
         return token
 
     def _expect_kind(self, *token_kinds: TokenKind):
         if len(token_kinds) < 1:
-            # TODO: log internal error
-            return
+            raise
 
         current_token = self._current_token()
 
@@ -43,8 +44,9 @@ class Parser:
             if current_token.kind == token_kind:
                 return self._advance()
 
-        # TODO: add diagnostics
-        return Token(token_kinds[0], self._current_token().pos, self._current_token().len)
+        if self._valid_token:
+            self._diagnostics.append(UnexpectedToken(self._current_token(), token_kinds[0]))
+        return Token(token_kinds[0], self._current_token().pos, self._current_token().length)
 
     def parse(self):
         self.tree = self._parse_expression()
@@ -56,12 +58,11 @@ class Parser:
     def _parse_equation(self):
         left = self._parse_binary_expression()
 
-        # TODO: move this to primary?
         if self._current_token().kind == TokenKind.Equal:
-            op = self._advance()
+            operator = self._advance()
             right = self._parse_expression()
 
-            return Equation(left, op, right)
+            return Equation(left, operator, right)
 
         return left
 
@@ -72,36 +73,20 @@ class Parser:
         left = self._parse_binary_expression(operator_precedence - 1)
 
         while self._current_token().precedence() == operator_precedence:
-            op = self._advance()
+            operator = Token(TokenKind.Star, self._current_token().pos, 0) if operator_precedence == Token.IMPLICIT_MULT_PRECEDENCE else self._advance()
             right = self._parse_binary_expression(operator_precedence - 1)
-            left = BinaryExpression(left, op, right)
+            left = BinaryExpression(left, operator, right)
 
         return left
 
     def _parse_unary_expression(self):
         if self._current_token().kind == TokenKind.Plus or self._current_token().kind == TokenKind.Minus:
-            op = self._advance()
+            operator = self._advance()
             right = self._parse_unary_expression()
 
-            return UnaryExpression(op, right)
+            return UnaryExpression(operator, right)
 
-        return self._parse_implicit_multiply()
-
-    def _parse_implicit_multiply(self):
-        left = self._parse_primary()
-
-        if self._current_token().kind == TokenKind.FunctionName     or \
-           self._current_token().kind == TokenKind.LParen           or \
-           self._current_token().kind == TokenKind.Literal          or \
-           self._current_token().kind == TokenKind.Number:
-
-            op = Token(TokenKind.Star, self._current_token().pos, 0)
-            right = self._parse_unary_expression()
-
-            # TODO: differenciate this from binary expression for esthetics
-            return BinaryExpression(left, op, right)
-
-        return left
+        return self._parse_primary()
 
     def _parse_primary(self):
         current_token = self._current_token()
@@ -123,7 +108,8 @@ class Parser:
             return Literal(self._advance())
 
         else:
-            # TODO: add diagnostics
+            if self._valid_token:
+                self._diagnostics.append(UnexpectedToken(self._current_token()))
             return Invalid(self._advance())
 
     def _parse_function(self):

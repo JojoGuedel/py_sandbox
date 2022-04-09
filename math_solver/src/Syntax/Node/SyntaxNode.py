@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 class SyntaxNode(ABC):
     def __str__(self):
-        return f"{__class__.__name__}"
+        return f"{self.__class__.__name__}"
     
     def __repr__(self):
         return str(self)
