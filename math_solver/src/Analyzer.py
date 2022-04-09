@@ -1,6 +1,5 @@
 from Syntax.Lexer import Lexer
-from Syntax.Parser import Parser
-
+from Syntax.Parser import Parser, ParserNode
 
 class Analyzer:
     def __init__(self):

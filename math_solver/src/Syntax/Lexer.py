@@ -1,12 +1,9 @@
-import enum
-from lib2to3.pgen2 import token
-import string
 from Syntax.Token import Token
 from Syntax.TokenKind import TokenKind
 
 
 class Lexer:
-    text: string
+    text: str
     pos: int
     tokens: list[Token]
 
