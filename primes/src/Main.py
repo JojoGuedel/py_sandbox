@@ -1,6 +1,4 @@
-from cmath import sqrt
 from decimal import Decimal
-from sys import maxsize
 
 class NumberType():
     pass
@@ -51,14 +49,14 @@ class Prime():
         for p in self.primes():
             while number % p == 0:
                 number /= p
-                factors.append(p)
+                yield p
             
             if p ** 2 > number:
-                factors.append(number)
-                return factors
+                yield number
+                return
 
             if number == 1:
-                return factors
+                return
             
 def factorize(number: Decimal):
     factors: list[Decimal] = []
@@ -75,10 +73,11 @@ def factorize(number: Decimal):
 
 if __name__ == "__main__":
     prime1 = Prime()
+    prime2 = Prime()
+    
     p = prime1.next(100000000)
     print(p)
-    print(prime1.factorize(p))
 
-    prime2 = Prime()
-    print(prime2.factorize(p))
+    print([i for i in prime1.factorize(p)])
+    print([i for i in prime2.factorize(p)])
     print(factorize(p))
