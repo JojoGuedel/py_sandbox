@@ -1,9 +1,9 @@
-from tokenize import Token
 from Syntax.Node.SyntaxNode import SyntaxNode
+from Syntax.Node.SyntaxToken import SyntaxToken
 
 
-class BinaryExpression(SyntaxNode):
-    def __init__(self, left: SyntaxNode, operator: Token, right: SyntaxNode):
+class BinaryExpressionSyntax(SyntaxNode):
+    def __init__(self, left: SyntaxNode, operator: SyntaxToken, right: SyntaxNode):
         self.left = left
         self.operator = operator
         self.right = right

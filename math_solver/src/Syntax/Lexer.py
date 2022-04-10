@@ -1,6 +1,6 @@
 from Diagnostics.DiagnosticBag import DiagnosticBag
 from Diagnostics.Kind.InvalidChar import InvalidChar
-from Syntax.Node.Token import Token
+from Syntax.Node.SyntaxToken import SyntaxToken
 from Syntax.TokenKind import TokenKind
 
 
@@ -9,7 +9,7 @@ class Lexer:
         self._text: str = text
         self._pos: int = 0
         self._diagnostics = diagnostics
-        self.tokens: list[Token] = []
+        self.tokens: list[SyntaxToken] = []
 
     def _current_char(self) -> str:
         if self._pos >= 0 and self._pos < len(self._text):
@@ -36,7 +36,7 @@ class Lexer:
             else:
                 break
 
-        self.tokens.append(Token(TokenKind.Number, start, self._pos - start))
+        self.tokens.append(SyntaxToken(TokenKind.Number, start, self._pos - start))
 
     def _lex_literal(self):
         start = self._pos
@@ -46,13 +46,13 @@ class Lexer:
                 self._pos += 1
 
             elif self._current_char() == '(':
-                self.tokens.append(Token(TokenKind.FunctionName, start, self._pos - start))
+                self.tokens.append(SyntaxToken(TokenKind.FunctionName, start, self._pos - start))
                 return
 
             else:
                 break
 
-        self.tokens.append(Token(TokenKind.Literal, start, self._pos - start))
+        self.tokens.append(SyntaxToken(TokenKind.Literal, start, self._pos - start))
 
     def _lex_space(self):
         start = self._pos
@@ -67,43 +67,43 @@ class Lexer:
 
         while True:
             if self._current_char() == "\0":
-                self.tokens.append(Token(TokenKind.End, self._pos, 1))
+                self.tokens.append(SyntaxToken(TokenKind.End, self._pos, 1))
                 break
 
             elif self._current_char() == "+":
-                self.tokens.append(Token(TokenKind.Plus, self._pos, 1))
+                self.tokens.append(SyntaxToken(TokenKind.Plus, self._pos, 1))
                 self._pos += 1
 
             elif self._current_char() == '-':
-                self.tokens.append(Token(TokenKind.Minus, self._pos, 1))
+                self.tokens.append(SyntaxToken(TokenKind.Minus, self._pos, 1))
                 self._pos += 1
 
             elif self._current_char() == "*":
-                self.tokens.append(Token(TokenKind.Star, self._pos, 1))
+                self.tokens.append(SyntaxToken(TokenKind.Star, self._pos, 1))
                 self._pos += 1
 
             elif self._current_char() == "/":
-                self.tokens.append(Token(TokenKind.Slash, self._pos, 1))
+                self.tokens.append(SyntaxToken(TokenKind.Slash, self._pos, 1))
                 self._pos += 1
 
             elif self._current_char() == "=":
-                self.tokens.append(Token(TokenKind.Equal, self._pos, 1))
+                self.tokens.append(SyntaxToken(TokenKind.Equal, self._pos, 1))
                 self._pos += 1
 
             elif self._current_char() == "^":
-                self.tokens.append(Token(TokenKind.Pow, self._pos, 1))
+                self.tokens.append(SyntaxToken(TokenKind.Pow, self._pos, 1))
                 self._pos += 1
 
             elif self._current_char() == "(":
-                self.tokens.append(Token(TokenKind.LParen, self._pos, 1))
+                self.tokens.append(SyntaxToken(TokenKind.LParen, self._pos, 1))
                 self._pos += 1
 
             elif self._current_char() == ")":
-                self.tokens.append(Token(TokenKind.RParen, self._pos, 1))
+                self.tokens.append(SyntaxToken(TokenKind.RParen, self._pos, 1))
                 self._pos += 1
 
             elif self._current_char() == ",":
-                self.tokens.append(Token(TokenKind.Comma, self._pos, 1))
+                self.tokens.append(SyntaxToken(TokenKind.Comma, self._pos, 1))
                 self._pos += 1
 
             elif str.isdigit(self._current_char()):
@@ -120,7 +120,7 @@ class Lexer:
             else:
                 self._diagnostics.append(InvalidChar(self._pos, 1, self._current_char()))
 
-                self.tokens.append(Token(TokenKind.Invalid, self._pos, 1))
+                self.tokens.append(SyntaxToken(TokenKind.Invalid, self._pos, 1))
                 self._pos += 1
 
 

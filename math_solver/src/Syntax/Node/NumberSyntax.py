@@ -1,9 +1,9 @@
 from Syntax.Node.SyntaxNode import SyntaxNode
-from Syntax.Node.Token import Token
+from Syntax.Node.SyntaxToken import SyntaxToken
 
 
-class Invalid(SyntaxNode):
-    def __init__(self, token: Token):
+class NumberSyntax(SyntaxNode):
+    def __init__(self, token: SyntaxToken):
         self.token = token
         
     def children(self):

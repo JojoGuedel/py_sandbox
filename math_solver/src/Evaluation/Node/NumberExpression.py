@@ -2,7 +2,7 @@ from Evaluation.Node.Expression import Expression
 
 
 class NumberExpression(Expression):
-    def __init__(self, value: int):
+    def __init__(self, value):
         self.value = value
 
     def children(self):

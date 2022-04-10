@@ -1,8 +1,8 @@
-from Syntax.Node.Token import Token
+from Syntax.Node.SyntaxToken import SyntaxToken
 from Syntax.Node.SyntaxNode import SyntaxNode
 
-class Function(SyntaxNode):
-    def __init__(self, function_name: Token, l_paren: SyntaxNode, args: list[SyntaxNode], r_paren: Token):
+class FunctionSyntax(SyntaxNode):
+    def __init__(self, function_name: SyntaxToken, l_paren: SyntaxNode, args: list[SyntaxNode], r_paren: SyntaxToken):
         self.function_name = function_name
         self.l_paren = l_paren
         self.args = args

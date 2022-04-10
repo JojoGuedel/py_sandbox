@@ -1,5 +1,5 @@
 from Diagnostics.DiagnosticKind import DiagnosticKind
-from Syntax.Node.Token import Token
+from Syntax.Node.SyntaxToken import SyntaxToken
 from Syntax.TokenKind import TokenKind
 
 
@@ -13,7 +13,7 @@ class UnexpectedToken(DiagnosticKind):
     @property
     def msg(self): return self._msg
 
-    def __init__(self, token: Token, expected_kind: TokenKind = None):
+    def __init__(self, token: SyntaxToken, expected_kind: TokenKind = None):
         self._pos = token.pos
         self._length = token.length
         self._msg = f"unexpected token '{token.kind}'" + (f", expected '{expected_kind}'" if not expected_kind is None else "")

@@ -2,7 +2,7 @@ from tokenize import Token
 from Syntax.Node.SyntaxNode import SyntaxNode
 
 
-class ParenthesizedExpression(SyntaxNode):
+class ParenthesizedExpressionSyntax(SyntaxNode):
     def __init__(self, l_paren: Token, expr: SyntaxNode, r_paren: Token):
         self.l_paren = l_paren
         self.expr = expr

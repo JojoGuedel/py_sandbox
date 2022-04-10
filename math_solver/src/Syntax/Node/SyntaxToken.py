@@ -2,7 +2,7 @@ from Syntax.Node.SyntaxNode import SyntaxNode
 from Syntax.TokenKind import TokenKind
 
 
-class Token(SyntaxNode):
+class SyntaxToken(SyntaxNode):
     IMPLICIT_MULT_PRECEDENCE = 1
     MAX_PRECEDENCE = 3
 

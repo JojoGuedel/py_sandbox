@@ -2,7 +2,7 @@ from tokenize import Token
 from Syntax.Node.SyntaxNode import SyntaxNode
 
 
-class Equation(SyntaxNode):
+class EquationSyntax(SyntaxNode):
     def __init__(self, left: SyntaxNode, operator: Token, right: SyntaxNode):
         self.left = left
         self.operator = operator

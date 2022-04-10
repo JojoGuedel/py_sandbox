@@ -1,5 +1,5 @@
 from abc import ABC, abstractproperty
-from Syntax.Node.Token import Token
+from Syntax.Node.SyntaxToken import SyntaxToken
 from Syntax.TokenKind import TokenKind
 
 class DiagnosticKind(ABC):

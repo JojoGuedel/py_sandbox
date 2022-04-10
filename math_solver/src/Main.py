@@ -1,3 +1,5 @@
+from cgitb import text
+from Analyzer import Analyzer
 from Diagnostics.DiagnosticBag import DiagnosticBag
 from Evaluation.Node.AddExpression import AddExpression
 from Evaluation.Node.Expression import Expression
@@ -7,16 +9,14 @@ from Evaluation.Node.VariableExpression import VariableExpression
 from Evaluation.Simplifier import Simplifier
 from Syntax.Lexer import Lexer
 from Syntax.Parser import Parser, SyntaxNode
-from Syntax.Node.Token import Token
+from Syntax.Node.SyntaxToken import SyntaxToken
 
 def print_parser_node(node: SyntaxNode, indent = "", is_last = True):
     marker = "└──" if is_last else "├──"
 
     print(indent + marker + str(node))
 
-    if not isinstance(node, Token):
-        print(indent + marker + str(node))
-
+    if not isinstance(node, SyntaxToken):
         indent += "    " if is_last else "│   "
         
         last_child = node.children()[-1]
@@ -35,10 +35,22 @@ def print_ir_node(node: Expression, indent = "", is_last = True):
         for child in node.children():
             print_ir_node(child, indent, child == last_child)
 
+if __name__ == "__main__":
+    text = "(a + b) (a + b)"
+    analyzer = Analyzer(text)
+    
+    bound_tree = analyzer.analyze()
+    # print_parser_node(analyzer.parser_tree)
+
+    if analyzer.diagnostics.any():
+        analyzer.diagnostics.print()
+    else:
+        print(text)
+        print_ir_node(bound_tree)
+
 if __name__ == "__main__" and False:
-    # text = "g(x, a, b)) a b c = 1b 2"
-    text = "=>"
-    print(text, end="\n\n")
+    text = "g(x, a, b) a b c = 1b 2"
+    print(text)
 
     diagnostics = DiagnosticBag(text)
     lexer = Lexer(text, diagnostics)
@@ -52,12 +64,7 @@ if __name__ == "__main__" and False:
     else:
         print_parser_node(parser.tree)
 
-    # print_parser_node(parser.tree)
-
-    # for i in lexer.tokens:
-    #     print(i)
-
-if __name__ == "__main__":
+if __name__ == "__main__" and False:
     expr = MultExpression(VariableExpression("a"), AddExpression(NumberExpression(5), AddExpression(VariableExpression("b"), VariableExpression("c"))))
     simplifier = Simplifier(expr)
     flattened_expr = simplifier.flatten()

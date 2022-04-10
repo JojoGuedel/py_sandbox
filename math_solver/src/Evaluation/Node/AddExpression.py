@@ -7,8 +7,7 @@ from Evaluation.Node.VariableExpression import VariableExpression
 class AddExpression(Expression, ComposedExpression):
     def __init__(self, *exprs):
         self._children = []
-        for i in exprs:
-            self._children.append(i)
+        self._children.extend(exprs)
 
     def append(self, expr: Expression):
         self._children.append(expr)
