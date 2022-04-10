@@ -7,10 +7,6 @@ class Prime():
     def __init__(self):
         self._primes = [2]
     
-    def _gen_primes(self, target: int):
-        while self._primes[-1] ** 2 <= target:
-            self._primes.append(self.next(self._primes[-1]))
-    
     def primes(self):
         p = 0
         i = 0
@@ -20,6 +16,7 @@ class Prime():
                 p = self._primes[i + 1]
             else:
                 p = self.next(p)
+                self._primes.append(p)
 
             i += 1
             yield p
@@ -27,8 +24,6 @@ class Prime():
     def next(self, current: int):
         if current < 2:
             return 2
-
-        self._gen_primes(current)
         
         while True:
             current += 1
@@ -44,8 +39,6 @@ class Prime():
                     break
     
     def factorize(self, number: int):
-        factors = []
-
         for p in self.primes():
             while number % p == 0:
                 number /= p
@@ -81,3 +74,7 @@ if __name__ == "__main__":
     print([i for i in prime1.factorize(p)])
     print([i for i in prime2.factorize(p)])
     print(factorize(p))
+
+    # print()
+    # for i in prime1.primes():
+    #     print(i)
